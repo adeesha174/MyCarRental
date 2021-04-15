@@ -53,6 +53,10 @@ class Rentals(db.Model):
         self.car_number = car_number
         self.rental_date = date.today()
 
+
+def check_car_number(car_number):
+    return True
+
 @app.route('/')
 def index():
     return render_template('index.html')
