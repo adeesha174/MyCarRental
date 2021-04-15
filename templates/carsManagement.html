@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Cars Management</title>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <h1>Cars Management</h1>
+
+    {% if message %}
+        <p class="message">{{ message | safe }}</p>
+    {% endif %}
+    
+    <form action="/carMenu" method="POST">
+        <input type="submit" name="carMenu" value="Show cars inventory" />
+        <br /><br />
+        <input type="submit" name="carMenu" value="Add new car" />
+        <br /><br />
+        <input type="submit" name="carMenu" value="Remove car" />
+    </form>
+    
+    <br/><br/>
+    <form action="/returnToMain" method="POST">
+        <input type="submit" name="return" value="Return to main page" />
+    </form>
+</div>
+{% endblock %}

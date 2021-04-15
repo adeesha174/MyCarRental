@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>End Car Rental</title>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <h1>End Car Rental</h1>
+
+    {% if message %}
+        <p class="message">{{ message | safe }}</p>
+    {% endif %}
+    
+    <form action="/endCarRental" method="POST">
+        <label for="number">Car number: (**-***-** or ***-**-***)</label><br>
+        <input type="text" name="number" />
+        <br /><br />
+        <input type="submit" name="end rental" value="End rental" />
+    </form>
+
+    <br/><br/>
+    <form action="/returnToRentalManagement" method="POST">
+        <input type="submit" name="cancel" value="Return to rental management" />
+    </form>
+    <form action="/returnToMain" method="POST">
+        <input type="submit" name="return" value="Return to main page" />
+    </form>
+</div>
+{% endblock %}
