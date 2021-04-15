@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from datetime import date, timezone
+import re
 
 app = Flask(__name__)
 
@@ -54,12 +55,39 @@ class Rentals(db.Model):
         self.rental_date = date.today()
 
 
+# Checking the car number is in the right format (**-***-** or ***-**-***)
 def check_car_number(car_number):
-    return True
+    if len(car_number) != 9 and len(car_number) != 10:
+        return False
+    
+    rex1 = re.compile('[0-9]{2}-[0-9]{3}-[0-9]{2}')
+    rex2 = re.compile('[0-9]{3}-[0-9]{2}-[0-9]{3}')
+
+    return rex1.match(car_number) is not None or rex2.match(car_number) is not None 
+
+
+# Checking the price is numeric and not empty
+def check_price(price):
+    return price == '' or not price.isnumeric()
+
+
+def check_id(customer_id):
+    if len(check_id != 9):
+        return False
+    
+    rex = re.compile('[0-9]{9}')
+    return rex.match(check_id) is not None
+
+
+def check_name(name):
+    rex = re.compile('[a-zA-Z]{2,}')
+    return rex.match(name).span()[1] == len(name)
+
 
 @app.route('/')
 def index():
     return render_template('index.html')
+
 
 # Directing the user to the right page
 @app.route('/submit', methods=['POST'])
@@ -73,6 +101,7 @@ def submit():
             return render_template('statistics.html')
     
     return render_template('index.html')
+
 
 # Directing the user to the right page
 @app.route('/carMenu', methods=['POST'])
@@ -88,6 +117,7 @@ def carMenu():
     
     return render_template('carsManagement.html')
 
+
 # Adding a new car to the inventory
 # If one or more fields are invalid -> Sends a corresponding message
 @app.route('/addNewCar', methods=['POST'])
@@ -99,19 +129,19 @@ def addNewCar():
         price_per_day = request.form['price per day']
         
         # Checking the input values
-        if len(car_number) != 9 and len(car_number) != 10:
+        if not check_car_number(car_number):
             return render_template('addNewCar.html', message='Invalid car number')
 
         if db.session.query(Cars_inventory).filter(Cars_inventory.car_number == car_number).count() > 0:
             return render_template('addNewCar.html', message='Car with that number already exists')
 
-        if manufacturer == 'Select manufacturer':
+        if manufacturer == '' or manufacturer == 'Select manufacturer':
             return render_template('addNewCar.html', message='Invalid manufacturer')
 
-        if price == '' or not price.isnumeric():
+        if check_price(price):
             return render_template('addNewCar.html', message='Invalid price')
 
-        if price_per_day == '' or not price_per_day.isnumeric():
+        if check_price(price_per_day):
             return render_template('addNewCar.html', message='Invalid price per day')
 
         car = Cars_inventory(car_number, manufacturer, price, price_per_day)
@@ -123,13 +153,14 @@ def addNewCar():
         except:
             return 'There was an error adding the car to the inventory'
 
+
 # Removing a car from the inventory by car number
 # If the number is invalid or the number doesn't exist -> Sends a corresponding message
 @app.route('/removeCar', methods=['POST'])
 def removeCar():
     car_number = request.form['number']
     
-    if len(car_number) != 9 and len(car_number) != 10:
+    if not check_car_number(car_number):
         return render_template('removeCar.html', message='Invalid car number')
 
     if db.session.query(Cars_inventory).filter(Cars_inventory.car_number == car_number).count() == 0:
@@ -143,6 +174,7 @@ def removeCar():
         return render_template('carsManagement.html', message='Car removed successfully')
     except:
         return 'There was an error deleting the car from the inventory'
+
 
 # Directing the user to the right page
 @app.route('/rentalMenu', methods=['POST'])
@@ -158,6 +190,7 @@ def rentalMenu():
     
     return render_template('rentalManagement.html')
 
+
 # Renting a car
 # If one or more fields are invalid or the car is already rented -> Sends a corresponding message
 @app.route('/rentCar', methods=['POST'])
@@ -169,7 +202,7 @@ def rentCar():
         car_number = request.form['number']
 
         # Checking the input values
-        if customer_id == '' or len(customer_id) != 9 or not customer_id.isnumeric():
+        if check_id(customer_id):
             return render_template('rentCar.html', message='Invalid customer ID')
 
         if customer_fname == '':
@@ -178,7 +211,7 @@ def rentCar():
         if customer_lname == '':
             return render_template('rentCar.html', message='Invalid customer last name')
 
-        if len(car_number) != 9 and len(car_number) != 10:
+        if not check_car_number(car_number):
             return render_template('rentCar.html', message='Invalid car number')
 
         if db.session.query(Rentals).filter(Rentals.car_number == car_number).count() > 0:
@@ -199,13 +232,14 @@ def rentCar():
         except:
             return 'There was an error renting the car'
 
+
 # Ending rental by car number
 # If the number is invalid or the number doesn't exist -> Sends a corresponding message
 @app.route('/endCarRental', methods=['POST'])
 def endCarRental():
     car_number = request.form['number']
     
-    if len(car_number) != 9 and len(car_number) != 10:
+    if not check_car_number(car_number):
         return render_template('endCarRental.html', message='Invalid car number')
 
     if db.session.query(Rentals).filter(Rentals.car_number == car_number).count() == 0:
@@ -227,23 +261,27 @@ def endCarRental():
     except:
         return 'There was an error ending the car rental'
 
+
 # Redirects the user to the main page
 @app.route('/returnToMain', methods=['POST'])
 def returnToMain():
     if request.method == 'POST':
         return render_template('index.html')
-    
+
+
 # Redirects the user to the cars management page
 @app.route('/returnToCarsManagement', methods=['POST'])
 def returnToCarsManagement():
     if request.method == 'POST':
         return render_template('carsManagement.html')
-    
+
+
 # Redirects the user to the rental management page
 @app.route('/returnToRentalManagement', methods=['POST'])
 def returnToRentalManagement():
     if request.method == 'POST':
         return render_template('rentalManagement.html')
+
 
 if __name__ == '__main__':
     app.run()
