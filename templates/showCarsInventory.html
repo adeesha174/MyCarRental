@@ -1,13 +1,14 @@
 {% extends 'base.html' %}
 
 {% block head %}
-<title>Show Cars Inventory</title>
+<title>Cars Inventory</title>
+{% endblock %}
+
+{% block title %}
+<h1>Cars Inventory</h1>
 {% endblock %}
 
 {% block body %}
-<div class="content">
-    <h1>Show Cars Inventory</h1>
-    
     {% if cars|length < 1 %}
         <p>Oops! There are no cars to show..</p>
     {% else %}
@@ -40,5 +41,4 @@
     <form action="/returnToMain" method="POST">
         <input type="submit" name="return" value="Return to main page" />
     </form>
-</div>
 {% endblock %}

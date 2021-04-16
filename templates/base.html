@@ -8,6 +8,12 @@
     {% block head %} {% endblock %}
 </head>
 <body>
-    {% block body %} {% endblock %}
+    <div class="content">
+        <header id="main-header">
+            {% block title %} {% endblock %}
+        </header>
+
+        {% block body %} {% endblock %}
+    </div>
 </body>
 </html>
