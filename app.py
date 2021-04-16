@@ -63,7 +63,7 @@ def check_car_number(car_number):
     rex1 = re.compile('[0-9]{2}-[0-9]{3}-[0-9]{2}')
     rex2 = re.compile('[0-9]{3}-[0-9]{2}-[0-9]{3}')
 
-    return rex1.match(car_number) is not None or rex2.match(car_number) is not None 
+    return rex1.match(car_number).span()[1] == len(car_number) or rex2.match(car_number).span()[1] == len(car_number)
 
 
 # Checking the price is numeric and not empty
@@ -76,7 +76,7 @@ def check_id(customer_id):
         return False
     
     rex = re.compile('[0-9]{9}')
-    return rex.match(check_id) is not None
+    return rex.match(check_id).span()[1] == len(name)
 
 
 def check_name(name):
@@ -89,6 +89,24 @@ def index():
     return render_template('index.html')
 
 
+def calc_statistics():
+    cars_inventory = db.session.query(Cars_inventory)
+
+    rented_cars = cars_inventory.filter(Cars_inventory.is_available == False).all()
+    rented_over_week = 0
+    total_money = 0
+    for rented in rented_cars_amount:
+        rental_days = (date.today() - rented.rental_date).days
+
+        if rental_days >= 7:
+            rented_over_week += 1
+        
+        temp_cost = (rental_days * rented.price_per_day) + rented.price
+        total_money += temp_cost
+
+    return cars_inventory.count(), rented_cars.count(), rented_over_week, total_money
+
+
 # Directing the user to the right page
 @app.route('/submit', methods=['POST'])
 def submit():
@@ -98,7 +116,12 @@ def submit():
         elif request.form['button'] == "Rental management":
             return render_template('rentalManagement.html')
         elif request.form['button'] == "Statistics":
-            return render_template('statistics.html')
+            cars_amount, rented_cars_amount, rented_cars_over_week_amount, total_money = calc_statistics()
+            return render_template('statistics.html', \
+                cars_amount=cars_amount, \
+                    rented_cars_amount=rented_cars_amount, \
+                        rented_cars_over_week_amount=rented_cars_over_week_amount, \
+                            total_money=total_money)
     
     return render_template('index.html')
 
@@ -138,10 +161,10 @@ def addNewCar():
         if manufacturer == '' or manufacturer == 'Select manufacturer':
             return render_template('addNewCar.html', message='Invalid manufacturer')
 
-        if check_price(price):
+        if not check_price(price):
             return render_template('addNewCar.html', message='Invalid price')
 
-        if check_price(price_per_day):
+        if not check_price(price_per_day):
             return render_template('addNewCar.html', message='Invalid price per day')
 
         car = Cars_inventory(car_number, manufacturer, price, price_per_day)
@@ -202,13 +225,13 @@ def rentCar():
         car_number = request.form['number']
 
         # Checking the input values
-        if check_id(customer_id):
+        if not check_id(customer_id):
             return render_template('rentCar.html', message='Invalid customer ID')
 
-        if customer_fname == '':
+        if not check_name(customer_fname):
             return render_template('rentCar.html', message='Invalid customer first name')
 
-        if customer_lname == '':
+        if not check_name(customer_lname):
             return render_template('rentCar.html', message='Invalid customer last name')
 
         if not check_car_number(car_number):
