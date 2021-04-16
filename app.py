@@ -76,6 +76,7 @@ def check_price(price):
     return price == '' or not price.isnumeric()
 
 
+# Checking the customer ID is numeric and in length 9
 def check_id(customer_id):
     if len(customer_id) != 9:
         return False
@@ -84,6 +85,7 @@ def check_id(customer_id):
     return rex.match(customer_id) is not None and rex.match(customer_id).span()[1] == len(customer_id)
 
 
+# Checking customer name has only letters and in length > 1
 def check_name(name):
     rex = re.compile('[a-zA-Z]{2,}')
     return rex.match(name) is not None and rex.match(name).span()[1] == len(name)
@@ -94,6 +96,7 @@ def index():
     return render_template('index.html')
 
 
+# Calculate the statistics values
 def calc_statistics():
     cars_amount = db.session.query(Cars_inventory).count()
 
