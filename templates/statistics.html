@@ -8,11 +8,12 @@
 <div class="content">
     <h1>Statistics</h1>
     
-    <p>There are {{cars_amount | safe}} in the inventory at the moment.</p>
-    <p>There are {{rented_cars_amount | safe}} at the moment.</p>
-    <p>There are {{rented_cars_over_week_amount | safe}} at the moment.</p>
-    <p>Amount of money awaits to be paid: {{total_money | safe}} shekels</p>
+    <p>There are {{cars_amount | safe}} cars in the inventory at the moment.</p>
+    <p>There are {{rented_cars_amount | safe}} rented cars at the moment.</p>
+    <p>There are {{rented_cars_over_week_amount | safe}} rented cars over a week at the moment.</p>
+    <p>Total amount of money awaits to be paid: {{total_money | safe}} shekels.</p>
 
+    <br /><br />
     <form action="/returnToMain" method="POST">
         <input type="submit" name="return" value="Return to main page" />
     </form>

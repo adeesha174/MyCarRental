@@ -63,7 +63,12 @@ def check_car_number(car_number):
     rex1 = re.compile('[0-9]{2}-[0-9]{3}-[0-9]{2}')
     rex2 = re.compile('[0-9]{3}-[0-9]{2}-[0-9]{3}')
 
-    return rex1.match(car_number).span()[1] == len(car_number) or rex2.match(car_number).span()[1] == len(car_number)
+    if rex1.match(car_number) is not None and rex1.match(car_number).span()[1] == len(car_number):
+        return True
+    elif rex2.match(car_number) is not None and rex2.match(car_number).span()[1] == len(car_number):
+        return True
+    
+    return False
 
 
 # Checking the price is numeric and not empty
@@ -72,11 +77,11 @@ def check_price(price):
 
 
 def check_id(customer_id):
-    if len(check_id != 9):
+    if len(customer_id) != 9:
         return False
     
     rex = re.compile('[0-9]{9}')
-    return rex.match(check_id).span()[1] == len(name)
+    return rex.match(customer_id).span()[1] == len(customer_id)
 
 
 def check_name(name):
@@ -90,12 +95,14 @@ def index():
 
 
 def calc_statistics():
-    cars_inventory = db.session.query(Cars_inventory)
+    cars_amount = db.session.query(Cars_inventory).count()
 
-    rented_cars = cars_inventory.filter(Cars_inventory.is_available == False).all()
+    rented_car_amount = db.session.query(Cars_inventory).filter(Cars_inventory.is_available == False).count()
+
+    rented_cars = db.session.query(Cars_inventory).filter(Cars_inventory.is_available == False).all()
     rented_over_week = 0
     total_money = 0
-    for rented in rented_cars_amount:
+    for rented in rented_cars:
         rental_days = (date.today() - rented.rental_date).days
 
         if rental_days >= 7:
@@ -103,8 +110,8 @@ def calc_statistics():
         
         temp_cost = (rental_days * rented.price_per_day) + rented.price
         total_money += temp_cost
-
-    return cars_inventory.count(), rented_cars.count(), rented_over_week, total_money
+    
+    return cars_amount, rented_car_amount, rented_over_week, total_money
 
 
 # Directing the user to the right page
