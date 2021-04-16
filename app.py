@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 from datetime import date, timezone
 import re
@@ -81,12 +81,12 @@ def check_id(customer_id):
         return False
     
     rex = re.compile('[0-9]{9}')
-    return rex.match(customer_id).span()[1] == len(customer_id)
+    return rex.match(customer_id) is not None and rex.match(customer_id).span()[1] == len(customer_id)
 
 
 def check_name(name):
     rex = re.compile('[a-zA-Z]{2,}')
-    return rex.match(name).span()[1] == len(name)
+    return rex.match(name) is not None and rex.match(name).span()[1] == len(name)
 
 
 @app.route('/')
@@ -296,7 +296,7 @@ def endCarRental():
 @app.route('/returnToMain', methods=['POST'])
 def returnToMain():
     if request.method == 'POST':
-        return render_template('index.html')
+        return redirect('/')
 
 
 # Redirects the user to the cars management page
