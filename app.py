@@ -217,7 +217,7 @@ def rentalMenu():
             return render_template('rentCar.html')
         elif request.form['rentalMenu'] == "Show currently rented cars":
             rentals = db.session.query(Rentals).all()
-            return render_template('showRentedCars.html', rentals=rentals)
+            return render_template('showRentedCars.html', rentals=rentals, today=date.today())
         elif request.form['rentalMenu'] == "End car rental":
             return render_template('endCarRental.html')
     

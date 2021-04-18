@@ -19,6 +19,7 @@
                 <th>Last name</th>
                 <th>Car number</th>
                 <th>Rental date</th>
+                <th>Rental days</th>
             </tr>
             {% for rental in rentals %}
                 <tr>
@@ -27,6 +28,7 @@
                     <td>{{ rental.customer_last_name }}</td>
                     <td>{{ rental.car_number }}</td>
                     <td>{{ rental.rental_date }}</td>
+                    <td>{{ (today - rental.rental_date).days }}</td>
                 </tr>
             {% endfor %}
         </table>

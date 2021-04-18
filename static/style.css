@@ -9,7 +9,7 @@ body {
 .content {
     font-family: 'Roboto', sans-serif;
     font-weight: 300;
-    max-width: 700px;
+    max-width: 800px;
     margin: auto;
     background: white;
     padding: 10px;
@@ -24,7 +24,7 @@ body {
     margin-top: 0;
     padding: 10px;
     background: white;
-    max-width: 700px;
+    max-width: 800px;
     text-align: center;
 }
 
