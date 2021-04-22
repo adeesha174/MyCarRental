@@ -2,17 +2,25 @@ from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 from datetime import date, timezone
 import re
+import json
 
 app = Flask(__name__)
 
-ENV = 'dev'
+# Reading the config file for the db connection
+with open('config.json') as f:
+    to_python = json.load(f)
 
-if ENV == 'dev':
-    app.debug = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:AdiSha206@localhost/my_car_rental'
-else:
-    app.debug = False
-    app.config['SQLALCHEMY_DATABASE_URI'] = ''
+username = to_python['dbusername']
+password = to_python['dbpassword']
+database = to_python['database']
+
+print(username)
+print(password)
+print(database)
+
+# Setting the db connection details
+app.debug = False
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://' + username + ':' + password + '@' + database
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
