@@ -14,10 +14,6 @@ username = to_python['dbusername']
 password = to_python['dbpassword']
 database = to_python['database']
 
-print(username)
-print(password)
-print(database)
-
 # Setting the db connection details
 app.debug = False
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://' + username + ':' + password + '@' + database
